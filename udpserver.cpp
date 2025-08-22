@@ -2,9 +2,47 @@
 #include <memory>
 #include <string>
 #include <mutex>
+#include <cstring>
 #include "udpserver.h"
 
 using std::string;
+
+//=============================================================================
+// makeServer() - Creates a UDP server on the specified port
+//=============================================================================
+static int makeServer(int port)
+{
+    uint32_t optval = 1;
+
+    // Create the socket and complain if we can't
+    int sd = socket(AF_INET, SOCK_DGRAM, 0);
+    if (sd < 0)
+    {
+        std::cerr << "Failed while creating UDP socket\n";
+        exit(1);        
+    }
+
+    // Ensure the socket can be reused
+    setsockopt(sd, SOL_SOCKET, SO_REUSEADDR, (const void *)&optval , sizeof(optval));
+
+    // Build the address structure of the UDP server
+    struct sockaddr_in serveraddr; 
+    memset(&serveraddr, 0, sizeof(serveraddr));
+    serveraddr.sin_family = AF_INET;
+    serveraddr.sin_addr.s_addr = htonl(INADDR_ANY);
+    serveraddr.sin_port = htons((unsigned short)port);
+
+    // Bind the socket to the port
+    if (bind(sd, (struct sockaddr *) &serveraddr, sizeof(serveraddr)) < 0)
+    {
+        std::cerr << "Unable to bind UDP server to port " << port << "\n";
+        exit(1);
+    }
+
+    // Return the socket descriptor to the caller
+    return sd;
+}
+//=============================================================================
 
 
 //=============================================================================
@@ -14,7 +52,7 @@ using std::string;
 void CUdpServer::start(int32_t localPort, int32_t remotePort)
 {
     // Create the addrinfo structure for sending UDP messages
-    if (!NetUtil::get_server_addrinfo(SOCK_DGRAM, "localhost", remotePort,
+    if (!NetUtil::get_server_addrinfo(SOCK_DGRAM, "0.0.0.0", remotePort,
                                       AF_INET, &remote_))
     {
         std::cerr << "Failed to create addrinfo structure\n";
@@ -31,27 +69,8 @@ void CUdpServer::start(int32_t localPort, int32_t remotePort)
         return;
     }
 
-
-    // Fetch information about the local machine
-    addrinfo_t server = NetUtil::get_local_addrinfo(SOCK_DGRAM, localPort, "localhost", AF_UNSPEC);
-
-    // Create the UDP server socket
-    int sd = socket(server.family, server.socktype, server.protocol);
-
-    // If that failed, tell the caller
-    if (sd < 0)
-    {
-        std::cerr << "Unable to create UDP server socket for port " << localPort << "\n";
-        return;
-    }
-
-    // Bind the socket to the specified port
-    if (bind(sd, server, server.addrlen) < 0) 
-    {
-        std::cerr << "Unable to bind UDP server to port " << localPort << "\n";
-        return;
-    }
-
+    // Create a UDP server
+    int sd = makeServer(localPort);
 
     // We're going to sit and listen for incoming messages forever
     while (true)

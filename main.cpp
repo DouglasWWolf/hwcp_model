@@ -86,6 +86,13 @@ void readOptions(const char** argv)
             continue;
         }
 
+        // Is the user turning on debug mode?
+        if (option == "-debug")
+        {
+            g.debug = true;
+            continue;            
+        }
+
         // If we get here, its an invalid command line
         cerr << "Invalid option: " + option + "\n";
         exit(1);

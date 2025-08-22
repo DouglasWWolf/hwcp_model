@@ -20,47 +20,13 @@ public:
         : std::runtime_error(std::string(name) + ": " + message) {}
 };
 
-
-
-/*
-json getNumber(json& j, const char* name)
-{
-    json value = j[name];
-    if (value.is_null())
-        throw JsonError(name, "field not found");
-    if (!value.is_number())
-        throw JsonError(name, "not number");
-    return value;
-}
-
-
-std::string getString(json& j, const char* name)
-{
-    json value = j[name];
-    if (value.is_null())
-        throw JsonError(name, "field not found");
-    if (!value.is_string())
-        throw JsonError(name, "not string");
-    return value;
-}
-
-
-json getField(json& j, const char* name)
-{
-    json value = j[name];
-    if (value.is_null())
-        throw JsonError(name, "field not found");
-    return value;
-}
-*/
-
 //=============================================================
 // MsgBase routines
 //==========================================================
 
-//==========================================================
+//=============================================================================
 // Fetches a string from the local json object
-//==========================================================
+//=============================================================================
 std::string ReqMsgBase::jsonGetString(const char* name)
 {
     json value = j_[name];
@@ -70,14 +36,14 @@ std::string ReqMsgBase::jsonGetString(const char* name)
         throw JsonError(name, "not string");
     return value;
 }
-//==========================================================
+//=============================================================================
 
 
 
 
-//==========================================================
+//=============================================================================
 // Fetches a number from the local json object
-//==========================================================
+//=============================================================================
 json ReqMsgBase::jsonGetNumber(const char* name)
 {
     json value = j_[name];
@@ -87,26 +53,26 @@ json ReqMsgBase::jsonGetNumber(const char* name)
         throw JsonError(name, "not number");
     return value;
 }
-//==========================================================
+//=============================================================================
 
 
 
 
 
-//=============================================================
+//================================================================================
 // Constructor - Fills in mandatory fields from the json
-//=============================================================
+//================================================================================
 ReqMsgBase::ReqMsgBase(json& j) : j_(j)
 {
-    mand_.ContextId     = getString(j_, "ContextId"    );
-    mand_.FutureReplyTo = getString(j_, "FutureReplyTo");
+    mand_.ContextId     = jsonGetString("ContextId"    );
+    mand_.FutureReplyTo = jsonGetString("FutureReplyTo");
 }
-//=============================================================
+//================================================================================
 
 
-//=============================================================
+//================================================================================
 // Constructor - Fills in mandatory fields from the json
-//=============================================================
+//================================================================================
 RspMsgBase::RspMsgBase(json& j) : j_(j)
 {
     mand_.replyTo       = jsonGetString("ImmediateReplyTo");
@@ -115,14 +81,14 @@ RspMsgBase::RspMsgBase(json& j) : j_(j)
     mand_.ResponseCode  = 0;
     mand_.MessageType   = jsonGetString("MessageType") + "Rsp";
 }
-//=============================================================
+//================================================================================
 
 
-//=============================================================
+//================================================================================
 // This adds our mandatory response fields and returns
 // the "ImmediateReplyTo" followed by a space followed by the
 // serialized JSON text.
-//=============================================================
+//================================================================================
 std::string RspMsgBase::encodeJson(json& j)
 {
     j["MessageType" ] = mand_.MessageType;
@@ -131,11 +97,11 @@ std::string RspMsgBase::encodeJson(json& j)
     j["ResponseText"] = mand_.ResponseText;
     return mand_.replyTo + " " + to_string(j) +"\n";
 }
-//=============================================================
+//================================================================================
 
-//==========================================================
+//=============================================================================
 // Fetches a string from the local json object
-//==========================================================
+//=============================================================================
 std::string RspMsgBase::jsonGetString(const char* name)
 {
     json value = j_[name];
@@ -145,7 +111,7 @@ std::string RspMsgBase::jsonGetString(const char* name)
         throw JsonError(name, "not string");
     return value;
 }
-//==========================================================
+//=============================================================================
 
 
 
@@ -196,7 +162,7 @@ std::string CJsonServer::onMessage(const char* msg)
         json j = json::parse(msg);
 
         // Fetch the message type
-        std::string messageType = getField(j, "MessageType");
+        std::string messageType = j["MessageType"];
 
         if (messageType == "MsgPing")
             return MsgPing::dispatch(j);

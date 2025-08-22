@@ -5,4 +5,5 @@ struct globals_t
 {
     std::string configFile = "hwcp_model.conf";
     CJsonServer jsonServer;
+    bool        debug = false;
 };
