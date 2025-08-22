@@ -98,7 +98,7 @@ void CUdpServer::send(std::string msg)
 //=============================================================================
 std::string CUdpServer::onMessage(const char* msg)
 {
-    std::cout << "We received: " << msg << "\n";
+    std::cout << "Default message handler received: " << msg << "\n";
     return "This is our response";
 }
 //=============================================================================

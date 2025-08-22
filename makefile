@@ -37,7 +37,8 @@ CXXFLAGS =	\
 -Wno-unused-result \
 -Wno-strict-aliasing \
 -fcommon \
--DLINUX 
+-DLINUX \
+-I ~/json/include
 
 
 #-----------------------------------------------------------------------------
@@ -209,13 +210,21 @@ debug:
 # DO NOT DELETE
 
 obj_x86/config_file.o: config_file.h tokenizer.h
+obj_x86/msg_handlers.o: msg_structs.h
 obj_x86/tokenizer.o: tokenizer.h
+obj_x86/json_handling.o: globals.h json_server.h udpserver.h netutil.h
+obj_x86/json_handling.o: msg_structs.h
 obj_x86/udpserver.o: udpserver.h netutil.h
 obj_x86/netutil.o: netutil.h
-obj_x86/main.o: history.h config_file.h udpserver.h netutil.h
+obj_x86/main.o: history.h config_file.h globals.h json_server.h udpserver.h
+obj_x86/main.o: netutil.h
 
 obj_arm/config_file.o: config_file.h tokenizer.h
+obj_arm/msg_handlers.o: msg_structs.h
 obj_arm/tokenizer.o: tokenizer.h
+obj_arm/json_handling.o: globals.h json_server.h udpserver.h netutil.h
+obj_arm/json_handling.o: msg_structs.h
 obj_arm/udpserver.o: udpserver.h netutil.h
 obj_arm/netutil.o: netutil.h
-obj_arm/main.o: history.h config_file.h udpserver.h netutil.h
+obj_arm/main.o: history.h config_file.h globals.h json_server.h udpserver.h
+obj_arm/main.o: netutil.h

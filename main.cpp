@@ -5,14 +5,11 @@
 #include <iostream>
 #include "history.h"
 #include "config_file.h"
-
-#include "udpserver.h"
+#include "globals.h"
 
 using std::cout;
 using std::cerr;
 using std::string;
-
-string configFile = "hwcp_model.conf";
 
 struct 
 {
@@ -23,14 +20,12 @@ struct
 } config;
 
 
-struct
-{
-    CUdpServer server;
-} g;
-
+// This structure contains all of our non-config global variables
+globals_t g;
 
 void readOptions(const char** argv);
 void readConfigFile(string filename);
+
 
 
 //=============================================================================
@@ -48,55 +43,14 @@ int main(int argc, const char** argv)
     readOptions(argv);
 
     // Read the configuration file
-    readConfigFile(configFile);
+    readConfigFile(g.configFile);
 
-
-    g.server.start(config.localUdpPort, config.conduitUdpPort);
+    // Start the JSON-aware UDP server
+    g.jsonServer.start(config.localUdpPort, config.conduitUdpPort);
 
     // We should never get here!
     exit(1);
-    /*
 
-    // Create a pipe between our thread and the "resetSocketThread"
-    pipe(serverResetPipe);
-
-    // Fetch the file descriptor of the read-side of the pipe
-    int pipefd = serverResetPipe[0];
-
-    // Create the addrinfo structure for sending UDP messages
-    if (!NetUtil::get_server_addrinfo(SOCK_DGRAM, "localhost", 1, AF_INET, &addrinfo))
-    {
-        cerr << "Failed to create addrinfo structure\n";
-        exit(1);        
-    }
-
-    // Create the UDP sendoer socket
-    senderfd = socket(addrinfo.family, addrinfo.socktype, addrinfo.protocol);
-
-    // If that failed, tell the caller
-    if (senderfd < 0)
-    {   
-        cerr << "Failed to create UDP socket\n";
-        exit(1);
-    }
-
-
-    // Launch the "resetSocketThread".   That thread will inform us (via the
-    // pipe) whenever someone connects to the server it's running.   When this
-    // happens, it's a sign that we should close our own server.
-    std::thread th1(
-                    resetSocketThread,
-                    config.serverPort + 1,
-                    serverResetPipe[1]
-                );
-    th1.detach();
-
-    // Launch the UDP server thread
-    std::thread th2(udpServerThread, config.udpPort);
-    th2.detach();
-
-    */
-  
 };
 //=============================================================================
 
@@ -128,7 +82,7 @@ void readOptions(const char** argv)
         // Is the user giving us the name of a config file?
         if (option == "-config" && *argv)
         {
-            configFile = *argv++;
+            g.configFile = *argv++;
             continue;
         }
 
@@ -156,7 +110,7 @@ void readConfigFile(string filename)
     // Read the config file and complain if we can't
     if (!c.read(filename, false))
     {
-        cerr << "Not found: " + configFile + "\n";
+        cerr << "Not found: " + filename + "\n";
         exit(1);
     }
 
@@ -223,5 +177,4 @@ void readConfigFile(string filename)
     }
 }
 //=============================================================================
-
 
