@@ -48,14 +48,6 @@ protected:
 
 
 
-struct MsgPingRsp  : public RspMsgBase
-{
-    MsgPingRsp(json& j) :  RspMsgBase(j) {};
-    uint32_t     value;
-    std::string  serialize();
-};
-
-
 
 struct MsgPing : public ReqMsgBase
 {
@@ -70,4 +62,12 @@ struct MsgPing : public ReqMsgBase
     } req;
 };
 
+
+
+struct MsgPingRsp  : public RspMsgBase
+{
+    MsgPingRsp(json& j) :  RspMsgBase(j) {};
+    uint32_t     value;
+    std::string  serialize();
+};
 

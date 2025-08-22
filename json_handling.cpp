@@ -6,22 +6,6 @@
 // Access to our global variables
 extern globals_t g;
 
-// The names of required fields
-const char* MESSAGE_TYPE    = "MessageType";
-const char* IMM_REPLY_TO    = "ImmediateReplyTo";
-const char* FUTURE_REPLY_TO = "FutureReplyTo";
-const char* CONTEXT_ID      = "ContextId";
-const char* RESPONSE_CODE   = "ResponseCode";
-const char* RESPONSE_TEXT   = "ResponseText";
-
-
-#define STD_RSP()     j[MESSAGE_TYPE ] = mand.MessageType;     \
-                      j[CONTEXT_ID   ] = mand.ContextId;       \
-                      j[RESPONSE_CODE] = mand.ResponseCode;    \
-                      j[RESPONSE_TEXT] = mand.ResponseText;    \
-                      return mand.replyTo + " " + to_string(j) +"\n";
-
-
 
 // Define a custom exception class inheriting from std::runtime_error
 class JsonError : public std::runtime_error
@@ -38,7 +22,7 @@ public:
 
 
 
-
+/*
 json getNumber(json& j, const char* name)
 {
     json value = j[name];
@@ -68,7 +52,7 @@ json getField(json& j, const char* name)
         throw JsonError(name, "field not found");
     return value;
 }
-
+*/
 
 //=============================================================
 // MsgBase routines
@@ -177,7 +161,6 @@ std::string MsgPing::dispatch(json& j)
     MsgPingRsp rsp(j);
 
     msg.deserialize();
-
     msg.handle(rsp);
     return rsp.serialize();
 }
