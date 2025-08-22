@@ -12,7 +12,7 @@ EXE = hwcp_model
 # This is a list of directories that have compilable code in them.  If there
 # are no subdirectories, this line must be SUBDIRS = .
 #-----------------------------------------------------------------------------
-SUBDIRS = . 
+SUBDIRS = . utils
 #-----------------------------------------------------------------------------
 
 #-----------------------------------------------------------------------------
@@ -38,6 +38,7 @@ CXXFLAGS =	\
 -Wno-strict-aliasing \
 -fcommon \
 -DLINUX \
+-I utils \
 -I ~/json/include
 
 
@@ -209,22 +210,18 @@ debug:
 
 # DO NOT DELETE
 
-obj_x86/config_file.o: config_file.h tokenizer.h
 obj_x86/msg_handlers.o: msg_structs.h
-obj_x86/tokenizer.o: tokenizer.h
-obj_x86/json_handling.o: globals.h json_server.h udpserver.h netutil.h
-obj_x86/json_handling.o: msg_structs.h
-obj_x86/udpserver.o: udpserver.h netutil.h
-obj_x86/netutil.o: netutil.h
-obj_x86/main.o: history.h config_file.h globals.h json_server.h udpserver.h
-obj_x86/main.o: netutil.h
+obj_x86/json_handling.o: globals.h json_server.h udpserver.h msg_structs.h
+obj_x86/udpserver.o: udpserver.h
+obj_x86/main.o: history.h globals.h json_server.h udpserver.h
+obj_x86/utils/config_file.o: utils/config_file.h utils/tokenizer.h
+obj_x86/utils/tokenizer.o: utils/tokenizer.h
+obj_x86/utils/netutil.o: utils/netutil.h
 
-obj_arm/config_file.o: config_file.h tokenizer.h
 obj_arm/msg_handlers.o: msg_structs.h
-obj_arm/tokenizer.o: tokenizer.h
-obj_arm/json_handling.o: globals.h json_server.h udpserver.h netutil.h
-obj_arm/json_handling.o: msg_structs.h
-obj_arm/udpserver.o: udpserver.h netutil.h
-obj_arm/netutil.o: netutil.h
-obj_arm/main.o: history.h config_file.h globals.h json_server.h udpserver.h
-obj_arm/main.o: netutil.h
+obj_arm/json_handling.o: globals.h json_server.h udpserver.h msg_structs.h
+obj_arm/udpserver.o: udpserver.h
+obj_arm/main.o: history.h globals.h json_server.h udpserver.h
+obj_arm/utils/config_file.o: utils/config_file.h utils/tokenizer.h
+obj_arm/utils/tokenizer.o: utils/tokenizer.h
+obj_arm/utils/netutil.o: utils/netutil.h
